@@ -5,7 +5,6 @@ import { wrapWithAbort } from './withabort.js';
 import { throwIfAborted } from '../../aborterror.js';
 import { isObject } from '../../util/isiterable.js';
 import { safeRace } from '../../util/safeRace.js';
-import { returnAsyncIterator } from '../../util/returniterator.js';
 
 /** @ignore */
 export class TimeoutError extends Error {
@@ -53,7 +52,9 @@ export class TimeoutAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
+
     const it = wrapWithAbort(this._source, signal)[Symbol.asyncIterator]();
+
     try {
       while (1) {
         const { type, value } = await safeRace<TimeoutOperation<TSource>>([
@@ -75,7 +76,7 @@ export class TimeoutAsyncIterable<TSource> extends AsyncIterableX<TSource> {
         yield value.value;
       }
     } finally {
-      await returnAsyncIterator(it);
+      await it?.return?.();
     }
   }
 }
@@ -89,7 +90,7 @@ export class TimeoutAsyncIterable<TSource> extends AsyncIterableX<TSource> {
  * @returns {MonoTypeOperatorAsyncFunction<TSource>} The source sequence with a TimeoutError in case of a timeout.
  */
 export function timeout<TSource>(dueTime: number): MonoTypeOperatorAsyncFunction<TSource> {
-  return function timeoutOperatorFunction(source: AsyncIterable<TSource>): AsyncIterableX<TSource> {
-    return new TimeoutAsyncIterable<TSource>(source, dueTime);
+  return function timeoutOperatorFunction(source) {
+    return new TimeoutAsyncIterable(source, dueTime);
   };
 }

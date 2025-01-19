@@ -14,10 +14,9 @@ export class ConcatAllAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
-    for await (const outer of wrapWithAbort(this._source, signal)) {
-      for await (const item of wrapWithAbort(outer, signal)) {
-        yield item;
-      }
+
+    for await (const inner of wrapWithAbort(this._source, signal)) {
+      yield* wrapWithAbort(inner, signal);
     }
   }
 }
@@ -30,9 +29,7 @@ export class ConcatAllAsyncIterable<TSource> extends AsyncIterableX<TSource> {
  * @returns {OperatorAsyncFunction<AsyncIterable<T>, T>} An operator which concatenates all inner async-iterable sources.
  */
 export function concatAll<T>(): OperatorAsyncFunction<AsyncIterable<T>, T> {
-  return function concatAllOperatorFunction(
-    source: AsyncIterable<AsyncIterable<T>>
-  ): AsyncIterableX<T> {
-    return new ConcatAllAsyncIterable<T>(source);
+  return function concatAllOperatorFunction(source) {
+    return new ConcatAllAsyncIterable(source);
   };
 }

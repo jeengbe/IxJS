@@ -16,12 +16,9 @@ export class EndWithAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
-    for await (const item of wrapWithAbort(this._source, signal)) {
-      yield item;
-    }
-    for (const x of this._args) {
-      yield x;
-    }
+
+    yield* wrapWithAbort(this._source, signal);
+    yield* this._args;
   }
 }
 
@@ -33,9 +30,7 @@ export class EndWithAsyncIterable<TSource> extends AsyncIterableX<TSource> {
  * @returns {MonoTypeOperatorAsyncFunction<TSource>} An operator which appends values to the end of the sequence.
  */
 export function endWith<TSource>(...args: TSource[]): MonoTypeOperatorAsyncFunction<TSource> {
-  return function endsWithOperatorFunction(
-    source: AsyncIterable<TSource>
-  ): AsyncIterableX<TSource> {
-    return new EndWithAsyncIterable<TSource>(source, args);
+  return function endsWithOperatorFunction(source) {
+    return new EndWithAsyncIterable(source, args);
   };
 }

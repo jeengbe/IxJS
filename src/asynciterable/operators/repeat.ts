@@ -16,17 +16,14 @@ export class RepeatAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
+
     if (this._count === -1) {
       while (1) {
-        for await (const item of wrapWithAbort(this._source, signal)) {
-          yield item;
-        }
+        yield* wrapWithAbort(this._source, signal);
       }
     } else {
       for (let i = 0; i < this._count; i++) {
-        for await (const item of wrapWithAbort(this._source, signal)) {
-          yield item;
-        }
+        yield* wrapWithAbort(this._source, signal);
       }
     }
   }
@@ -40,7 +37,7 @@ export class RepeatAsyncIterable<TSource> extends AsyncIterableX<TSource> {
  * @returns {MonoTypeOperatorAsyncFunction<TSource>} The async-iterable sequence producing the elements of the given sequence repeatedly.
  */
 export function repeat<TSource>(count = -1): MonoTypeOperatorAsyncFunction<TSource> {
-  return function repeatOperatorFunction(source: AsyncIterable<TSource>): AsyncIterableX<TSource> {
-    return new RepeatAsyncIterable<TSource>(source, count);
+  return function repeatOperatorFunction(source) {
+    return new RepeatAsyncIterable(source, count);
   };
 }

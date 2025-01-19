@@ -17,10 +17,9 @@ class WhileAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
+
     while (await this._condition(signal)) {
-      for await (const item of wrapWithAbort(this._source, signal)) {
-        yield item;
-      }
+      yield* wrapWithAbort(this._source, signal);
     }
   }
 }
@@ -38,5 +37,5 @@ export function whileDo<TSource>(
   source: AsyncIterable<TSource>,
   condition: (signal?: AbortSignal) => boolean | Promise<boolean>
 ): AsyncIterableX<TSource> {
-  return new WhileAsyncIterable<TSource>(condition, source);
+  return new WhileAsyncIterable(condition, source);
 }

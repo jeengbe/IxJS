@@ -11,11 +11,12 @@ class AnonymousAsyncIterable<T> extends AsyncIterableX<T> {
 
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
+
     const it = await this._fn(signal);
-    let next: IteratorResult<T> | undefined;
-    while (!(next = await it.next()).done) {
-      yield next.value;
-    }
+
+    yield* {
+      [Symbol.asyncIterator]: () => it,
+    };
   }
 }
 
