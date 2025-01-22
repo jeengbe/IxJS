@@ -47,22 +47,3 @@ export function repeat<TSource>(count = -1): MonoTypeOperatorAsyncFunction<TSour
     return new RepeatAsyncIterable(source, count);
   };
 }
-
-export async function tt() {
-  function* generate() {
-    yield 1;
-  }
-
-  async function* repeat() {
-    const x = generate();
-
-    while (true) {
-      yield* x;
-      console.log('repeat');
-    }
-  }
-
-  const it = repeat()[Symbol.asyncIterator]();
-  console.log(await it.next());
-  await it.return?.();
-}
