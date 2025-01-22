@@ -14,9 +14,11 @@ export class OnErrorResumeNextAsyncIterable<TSource> extends AsyncIterableX<TSou
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
 
-    for (const item of this._source) {
+    for (const outer of this._source) {
       try {
-        yield* wrapWithAbort(item, signal);
+        for await (const inner of wrapWithAbort(outer, signal)) {
+          yield inner;
+        }
       } catch {
         // ignore
       }

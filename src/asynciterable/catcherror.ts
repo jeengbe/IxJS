@@ -22,7 +22,9 @@ export class CatchAllAsyncIterable<TSource> extends AsyncIterableX<TSource> {
       hasError = false;
 
       try {
-        yield* wrapWithAbort(source, signal);
+        for await (const item of wrapWithAbort(source, signal)) {
+          yield item;
+        }
       } catch (e) {
         error = e;
         hasError = true;

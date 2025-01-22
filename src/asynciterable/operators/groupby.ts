@@ -19,7 +19,9 @@ export class GroupedAsyncIterable<TKey, TValue> extends AsyncIterableX<TValue> {
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
 
-    yield* this._source;
+    for await (const item of this._source) {
+      yield item;
+    }
   }
 }
 

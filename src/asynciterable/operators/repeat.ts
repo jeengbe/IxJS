@@ -17,8 +17,6 @@ export class RepeatAsyncIterable<TSource> extends AsyncIterableX<TSource> {
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
 
-    // Can't yield* in a loop
-    // See: https://github.com/microsoft/TypeScript/issues/61022
     if (this._count === -1) {
       while (1) {
         for await (const item of wrapWithAbort(this._source, signal)) {

@@ -21,7 +21,9 @@ export class ReverseAsyncIterable<TSource> extends AsyncIterableX<TSource> {
       results.unshift(item);
     }
 
-    yield* results;
+    for await (const item of results) {
+      yield item;
+    }
   }
 }
 

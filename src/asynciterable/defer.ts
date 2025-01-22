@@ -15,7 +15,9 @@ class DeferAsyncIterable<TSource> extends AsyncIterableX<TSource> {
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
 
-    yield* wrapWithAbort(await this._fn(signal), signal);
+    for await (const item of wrapWithAbort(await this._fn(signal), signal)) {
+      yield item;
+    }
   }
 }
 

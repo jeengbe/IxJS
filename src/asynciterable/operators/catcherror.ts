@@ -30,14 +30,18 @@ export class CatchWithAsyncIterable<TSource, TResult> extends AsyncIterableX<TSo
     let hasError = false;
 
     try {
-      yield* wrapWithAbort(this._source, signal);
+      for await (const item of wrapWithAbort(this._source, signal)) {
+        yield item;
+      }
     } catch (e) {
       err = await this._handler(e, signal);
       hasError = true;
     }
 
     if (hasError) {
-      yield* wrapWithAbort(err!, signal);
+      for await (const item of wrapWithAbort(err!, signal)) {
+        yield item;
+      }
     }
   }
 }

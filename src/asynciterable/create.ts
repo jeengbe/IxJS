@@ -14,9 +14,11 @@ class AnonymousAsyncIterable<T> extends AsyncIterableX<T> {
 
     const it = await this._fn(signal);
 
-    yield* {
+    for await (const item of {
       [Symbol.asyncIterator]: () => it,
-    };
+    }) {
+      yield item;
+    }
   }
 }
 

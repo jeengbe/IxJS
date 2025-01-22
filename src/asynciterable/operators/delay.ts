@@ -20,7 +20,9 @@ export class DelayAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
     await sleep(this._dueTime, signal);
 
-    yield* wrapWithAbort(this._source, signal);
+    for await (const item of wrapWithAbort(this._source, signal)) {
+      yield item;
+    }
   }
 }
 

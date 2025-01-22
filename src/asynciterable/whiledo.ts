@@ -19,7 +19,9 @@ class WhileAsyncIterable<TSource> extends AsyncIterableX<TSource> {
     throwIfAborted(signal);
 
     while (await this._condition(signal)) {
-      yield* wrapWithAbort(this._source, signal);
+      for await (const item of wrapWithAbort(this._source, signal)) {
+        yield item;
+      }
     }
   }
 }

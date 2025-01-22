@@ -43,9 +43,11 @@ export class RaceAsyncIterable<TSource> extends AsyncIterableX<TSource> {
 
     await returnAsyncIterators(iterators.filter((_, i) => i !== index));
 
-    yield* {
+    for await (const item of {
       [Symbol.asyncIterator]: () => iterators[index],
-    };
+    }) {
+      yield item;
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 import { hasNext, hasErr, noNext } from '../asynciterablehelpers.js';
 import { range, throwError } from 'ix/asynciterable/index.js';
-import { finalize, tap, concatMap } from 'ix/asynciterable/operators/index.js';
+import { finalize, tap, flatMap } from 'ix/asynciterable/operators/index.js';
 
 test('AsyncIterable#finalize defers behavior', async () => {
   let done = false;
@@ -79,7 +79,7 @@ test('AsyncIterable#finalize calls with downstream error from flattening', async
     finalize(async () => {
       done = true;
     }),
-    concatMap(async (x) => {
+    flatMap(async (x) => {
       // srcValues.push(x);
       if (x === 1) {
         return throwError(err);

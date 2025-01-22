@@ -18,7 +18,9 @@ export class FinallyAsyncIterable<TSource> extends AsyncIterableX<TSource> {
     throwIfAborted(signal);
 
     try {
-      yield* wrapWithAbort(this._source, signal);
+      for await (const item of wrapWithAbort(this._source, signal)) {
+        yield item;
+      }
     } finally {
       await this._action();
     }

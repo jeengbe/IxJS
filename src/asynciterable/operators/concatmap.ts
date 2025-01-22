@@ -20,7 +20,9 @@ class ConcatMapAsyncIterable<TSource, TResult> extends AsyncIterableX<TResult> {
     for await (const outer of wrapWithAbort(this._source, signal)) {
       const values = await this._selector.call(this._thisArg, outer, outerIndex++, signal);
 
-      yield* wrapWithAbort(AsyncIterableX.as(values), signal);
+      for await (const inner of wrapWithAbort(AsyncIterableX.as(values), signal)) {
+        yield inner;
+      }
     }
   }
 }
