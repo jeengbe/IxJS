@@ -17,13 +17,19 @@ export class RepeatAsyncIterable<TSource> extends AsyncIterableX<TSource> {
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
 
+    // Can't yield* in a loop
+    // See: https://github.com/microsoft/TypeScript/issues/61022
     if (this._count === -1) {
       while (1) {
-        yield* wrapWithAbort(this._source, signal);
+        for await (const item of wrapWithAbort(this._source, signal)) {
+          yield item;
+        }
       }
     } else {
       for (let i = 0; i < this._count; i++) {
-        yield* wrapWithAbort(this._source, signal);
+        for await (const item of wrapWithAbort(this._source, signal)) {
+          yield item;
+        }
       }
     }
   }
@@ -40,4 +46,23 @@ export function repeat<TSource>(count = -1): MonoTypeOperatorAsyncFunction<TSour
   return function repeatOperatorFunction(source) {
     return new RepeatAsyncIterable(source, count);
   };
+}
+
+export async function tt() {
+  function* generate() {
+    yield 1;
+  }
+
+  async function* repeat() {
+    const x = generate();
+
+    while (true) {
+      yield* x;
+      console.log('repeat');
+    }
+  }
+
+  const it = repeat()[Symbol.asyncIterator]();
+  console.log(await it.next());
+  await it.return?.();
 }
