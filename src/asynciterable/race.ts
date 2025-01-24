@@ -37,11 +37,11 @@ export class RaceAsyncIterable<TSource> extends AsyncIterableX<TSource> {
       index,
     } = await safeRace(nexts);
 
+    await returnAsyncIterators(iterators.filter((_, i) => i !== index));
+
     if (!done) {
       yield value;
     }
-
-    await returnAsyncIterators(iterators.filter((_, i) => i !== index));
 
     for await (const item of {
       [Symbol.asyncIterator]: () => iterators[index],

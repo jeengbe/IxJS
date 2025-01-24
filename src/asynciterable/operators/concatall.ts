@@ -15,8 +15,8 @@ export class ConcatAllAsyncIterable<TSource> extends AsyncIterableX<TSource> {
   async *[Symbol.asyncIterator](signal?: AbortSignal) {
     throwIfAborted(signal);
 
-    for await (const inner of wrapWithAbort(this._source, signal)) {
-      for await (const item of wrapWithAbort(inner, signal)) {
+    for await (const outer of wrapWithAbort(this._source, signal)) {
+      for await (const item of wrapWithAbort(outer, signal)) {
         yield item;
       }
     }

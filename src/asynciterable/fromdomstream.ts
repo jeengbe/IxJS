@@ -41,9 +41,7 @@ async function* _consumeReader<T>(
 ): AsyncIterator<T, any, undefined> {
   let threw = false;
   try {
-    for await (const item of iterator) {
-      yield item;
-    }
+    yield* iterator;
   } catch (e) {
     if ((threw = true) && reader) {
       await reader['cancel'](e);

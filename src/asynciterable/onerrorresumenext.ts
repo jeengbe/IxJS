@@ -16,8 +16,8 @@ export class OnErrorResumeNextAsyncIterable<TSource> extends AsyncIterableX<TSou
 
     for (const outer of this._source) {
       try {
-        for await (const inner of wrapWithAbort(outer, signal)) {
-          yield inner;
+        for await (const item of wrapWithAbort(outer, signal)) {
+          yield item;
         }
       } catch {
         // ignore

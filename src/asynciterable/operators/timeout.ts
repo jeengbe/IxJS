@@ -5,6 +5,7 @@ import { wrapWithAbort } from './withabort.js';
 import { throwIfAborted } from '../../aborterror.js';
 import { isObject } from '../../util/isiterable.js';
 import { safeRace } from '../../util/safeRace.js';
+import { returnAsyncIterators } from '../../util/returniterator.js';
 
 /** @ignore */
 export class TimeoutError extends Error {
@@ -76,7 +77,7 @@ export class TimeoutAsyncIterable<TSource> extends AsyncIterableX<TSource> {
         yield value.value;
       }
     } finally {
-      await it?.return?.();
+      await returnAsyncIterators([it]);
     }
   }
 }
